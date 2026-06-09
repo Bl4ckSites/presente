@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surpresa</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+</head>
+<body>
+  <!-- Camadas de fundo -->
+  <div class="bg-layer"></div>
+  <div class="blur-orb orb-1"></div>
+  <div class="blur-orb orb-2"></div>
+  <div class="blur-orb orb-3"></div>
+  <canvas id="particlesCanvas"></canvas>
+
+  <div class="container">
+    <!-- Caixa de presente (estrutura rica) -->
+    <div class="gift-wrapper" id="giftBox">
+      <div class="gift-glow"></div>
+      <div class="gift-lid">
+        <div class="lid-top"></div>
+        <div class="lid-front"></div>
+        <div class="lid-shine"></div>
+      </div>
+      <div class="gift-base">
+        <div class="base-front"></div>
+        <div class="base-side"></div>
+        <div class="base-inner"></div>
+      </div>
+      <div class="gift-ribbon-vertical">
+        <div class="ribbon-shine"></div>
+      </div>
+      <div class="gift-ribbon-horizontal">
+        <div class="ribbon-shine"></div>
+      </div>
+      <div class="gift-bow">
+        <div class="bow-loop bow-left"></div>
+        <div class="bow-loop bow-right"></div>
+        <div class="bow-center"></div>
+      </div>
+      <!-- Partículas orbitais ao redor (canvas via JS, mas pode usar elementos também) -->
+      <div class="sparkle-container" id="sparkleContainer"></div>
+      <!-- Brilho ao abrir -->
+      <div class="open-flash" id="openFlash"></div>
+      <!-- Confetes (container) -->
+      <div class="confetti-container" id="confettiContainer"></div>
+    </div>
+    <!-- Texto abaixo -->
+    <p class="touch-text">Toque na caixa para abrir</p>
+  </div>
+
+  <!-- Indicador de carregamento oculto -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader-ring"></div>
+    <p>Preparando sua surpresa...</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

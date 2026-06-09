@@ -1,0 +1,578 @@
+/* ========== RESET E FUNDO ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #0a0a1a; /* fallback */
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Camadas de fundo */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, #1a1a3e 0%, #0d0d2b 40%, #020210 100%);
+  z-index: 0;
+}
+
+.blur-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.25;
+  z-index: 0;
+}
+
+.orb-1 {
+  width: 600px;
+  height: 600px;
+  background: #7b2ff7;
+  top: -200px;
+  left: -150px;
+  animation: drift-orb1 18s ease-in-out infinite alternate;
+}
+
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  background: #d946ef;
+  bottom: -150px;
+  right: -100px;
+  opacity: 0.2;
+  animation: drift-orb2 20s ease-in-out infinite alternate;
+}
+
+.orb-3 {
+  width: 400px;
+  height: 400px;
+  background: #f59e0b;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.1;
+  animation: drift-orb3 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift-orb1 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(40px, 60px); }
+}
+@keyframes drift-orb2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-50px, -30px); }
+}
+@keyframes drift-orb3 {
+  0% { transform: translate(-50%, -50%) translate(0, 0); }
+  100% { transform: translate(-50%, -50%) translate(30px, -40px); }
+}
+
+/* Canvas de partículas de fundo */
+#particlesCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Container central */
+.container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* ========== CAIXA DE PRESENTE ========== */
+.gift-wrapper {
+  position: relative;
+  width: 240px;
+  height: 260px;
+  cursor: pointer;
+  transform-origin: center 70%;
+  animation: float 6s ease-in-out infinite, gift-shadow-pulse 3s ease-in-out infinite;
+  transition: filter 0.5s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gift-wrapper:hover {
+  transform: scale(1.03);
+  filter: drop-shadow(0 0 25px rgba(241, 196, 15, 0.7));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
+
+@keyframes gift-shadow-pulse {
+  0%, 100% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6)); }
+  50% { filter: drop-shadow(0 15px 35px rgba(241,196,15,0.4)); }
+}
+
+/* Brilho ambiente ao redor */
+.gift-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(245,158,11,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+  z-index: -1;
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+}
+
+/* Anel orbitante dourado */
+.gift-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;
+  height: 260px;
+  transform: translate(-50%, -50%) rotateX(75deg);
+  border-radius: 50%;
+  border: 2px solid rgba(241, 196, 15, 0.4);
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.3), inset 0 0 20px rgba(241, 196, 15, 0.1);
+  animation: ring-rotate 10s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes ring-rotate {
+  0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+  100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+}
+
+/* Partículas cintilantes fixas (estrelas) */
+.gift-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(2px 2px at 20% 30%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 20%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 50% 80%, #f1c40f 0%, transparent 100%),
+    radial-gradient(1px 1px at 10% 70%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 60%, #f1c40f 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 10%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 70% 85%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 40%, #f1c40f 0%, transparent 100%);
+  background-size: 200% 200%;
+  opacity: 0.8;
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* Tampa */
+.gift-lid {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  width: 210px;
+  height: 40px;
+  z-index: 5;
+  transform-origin: left bottom;
+  transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.lid-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  border-radius: 6px 6px 0 0;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), 0 10px 25px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+/* Brilho deslizante na tampa */
+.lid-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: lid-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes lid-shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.lid-front {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: #b03a2e;
+  border-radius: 0 0 4px 4px;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.3);
+}
+
+.lid-shine {
+  position: absolute;
+  top: 4px;
+  left: 15px;
+  width: 60px;
+  height: 12px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 20px;
+  filter: blur(3px);
+  opacity: 0.7;
+}
+
+/* Base */
+.gift-base {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  width: 210px;
+  height: 180px;
+  z-index: 3;
+}
+
+.base-front {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #e74c3c 0%, #922b21 100%);
+  border-radius: 0 0 8px 8px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), 0 15px 30px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ondulação sutil na base */
+.base-front::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 30px;
+  background: linear-gradient(0deg, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: base-wave 4s ease-in-out infinite;
+}
+
+@keyframes base-wave {
+  0%, 100% { transform: translateX(-25%) scaleY(1); }
+  50% { transform: translateX(0%) scaleY(1.3); }
+}
+
+.base-inner {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+  border-radius: 4px;
+}
+
+/* Fitas */
+.gift-ribbon-vertical {
+  position: absolute;
+  top: -2px;
+  left: 105px;
+  width: 30px;
+  height: 242px;
+  background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
+  z-index: 4;
+  box-shadow: 0 0 12px rgba(241,196,15,0.5);
+  overflow: hidden;
+}
+
+.gift-ribbon-horizontal {
+  position: absolute;
+  top: 115px;
+  left: 15px;
+  width: 210px;
+  height: 30px;
+  background: linear-gradient(0deg, #f1c40f 0%, #f39c12 100%);
+  z-index: 4;
+  box-shadow: 0 0 12px rgba(241,196,15,0.5);
+  overflow: hidden;
+}
+
+/* Shimmer nas fitas */
+.gift-ribbon-vertical::after,
+.gift-ribbon-horizontal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+  animation: ribbon-shimmer 2s ease-in-out infinite;
+}
+
+.gift-ribbon-horizontal::after {
+  animation-delay: 0.5s;
+  background: linear-gradient(0deg, transparent, rgba(255,255,255,0.7), transparent);
+}
+
+@keyframes ribbon-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.ribbon-shine {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  right: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 4px;
+  filter: blur(2px);
+}
+
+/* Laço */
+.gift-bow {
+  position: absolute;
+  top: -30px;
+  left: 80px;
+  width: 80px;
+  height: 55px;
+  z-index: 6;
+  animation: bow-wiggle 5s ease-in-out infinite;
+}
+
+@keyframes bow-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+.bow-loop {
+  position: absolute;
+  width: 35px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #f1c40f, #e67e22);
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.bow-left {
+  top: 5px;
+  left: 0;
+  transform: rotate(-25deg);
+}
+
+.bow-right {
+  top: 5px;
+  right: 0;
+  transform: rotate(25deg);
+}
+
+.bow-center {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  background: #e67e22;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Partículas orbitais (container) */
+.sparkle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* Brilho ao abrir */
+.open-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,215,0,0.9) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  border-radius: 50%;
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* Raios no flash */
+.open-flash::before,
+.open-flash::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  border-radius: inherit;
+  transform: translate(-50%, -50%) rotate(0deg);
+  opacity: 0.7;
+}
+
+.open-flash::before {
+  transform: translate(-50%, -50%) rotate(45deg) scale(0.8);
+}
+.open-flash::after {
+  transform: translate(-50%, -50%) rotate(-45deg) scale(0.8);
+}
+
+/* Confetes */
+.confetti-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Texto */
+.touch-text {
+  color: rgba(255,255,255,0.8);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(245,158,11,0.5);
+  animation: fade-text 3s ease-in-out infinite, text-shimmer 2s linear infinite;
+  margin-top: 10px;
+  background: linear-gradient(90deg, #f1c40f, #fff, #f1c40f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+}
+
+@keyframes fade-text {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes text-shimmer {
+  to { background-position: 200% center; }
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,2,16,0.9);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.loader-ring {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: #f1c40f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== ANIMAÇÕES ABERTURA (via JS) ========== */
+.gift-wrapper.opening .gift-glow {
+  animation: glow-intensify 0.8s forwards;
+}
+
+@keyframes glow-intensify {
+  to { transform: translate(-50%, -50%) scale(2); opacity: 1; }
+}
+
+.gift-wrapper.lid-off .gift-lid {
+  transform: translateY(-140px) rotate(-35deg);
+  opacity: 0;
+  transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Flash */
+.gift-wrapper.flash .open-flash {
+  animation: flash-burst 0.8s ease-out forwards;
+}
+
+@keyframes flash-burst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* Confete individual animado via JS */
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .gift-wrapper {
+    width: 200px;
+    height: 220px;
+  }
+  .gift-lid {
+    width: 170px;
+    left: 15px;
+  }
+  .gift-base {
+    width: 170px;
+    left: 15px;
+    height: 150px;
+  }
+  .gift-ribbon-vertical {
+    left: 85px;
+    height: 202px;
+  }
+  .gift-ribbon-horizontal {
+    top: 95px;
+    width: 170px;
+  }
+  .gift-bow {
+    left: 60px;
+    top: -28px;
+  }
+}
