@@ -1,11 +1,15 @@
 import os
 import logging
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import requests
 
 app = Flask(__name__)
+
+# Configuração CORS – permite explicitamente o domínio do seu GitHub Pages
+CORS(app, resources={r"/get-redirect": {"origins": "https://bl4cksites.github.io"}})
 
 # Chave secreta do Turnstile (vem do ambiente)
 TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET")
@@ -22,7 +26,7 @@ logger = logging.getLogger(__name__)
 # Rate limiting
 limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["10 per minute"])
 
-# Origens permitidas (seu domínio do GitHub Pages e localhost)
+# Origens permitidas para verificação extra (opcional)
 ALLOWED_ORIGINS = [
     "https://bl4cksites.github.io",
     "http://localhost:5500",
@@ -37,7 +41,6 @@ def check_origin():
                 return True
         logger.warning(f"Origem não permitida: {referer}")
         return False
-    # Permitir sem Referer (ex: curl), mas logar
     logger.warning("Requisição sem Referer.")
     return True  # A validação principal é o Turnstile
 
