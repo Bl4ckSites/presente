@@ -1,6 +1,6 @@
 // =============================================
 // CONFIGURAÇÕES (SUBSTITUIR APÓS CRIAR WIDGET TURNSTILE)
-const TURNSTILE_SITE_KEY = '0x4AAAAAAAfH4qXYhOV4P_Ya'; // <-- INSIRA SUA SITE KEY AQUI
+const TURNSTILE_SITE_KEY = '0x4AAAAAADhe9cpabGDf6_Ge';  // Site Key verdadeira
 const BACKEND_URL = 'https://presente-0h1e.onrender.com';    // <-- URL DO RENDER APÓS DEPLOY
 // =============================================
 
