@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -8,8 +8,9 @@ import requests
 
 app = Flask(__name__)
 
-# Configuração CORS – permite explicitamente o domínio do seu GitHub Pages
-CORS(app, resources={r"/get-redirect": {"origins": "https://fadinha.xyz"}})
+# CORS – permite qualquer origem? Não, vamos especificar a sua.
+CORS(app, origins=["https://fadinha.xyz"])
+
 # Chave secreta do Turnstile (vem do ambiente)
 TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET")
 # URL de destino (Telegram)
@@ -18,40 +19,17 @@ REDIRECT_URL = os.getenv("REDIRECT_URL", "https://t.me/seu_canal")
 if not TURNSTILE_SECRET:
     raise RuntimeError("Variável TURNSTILE_SECRET não definida.")
 
-# Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Rate limiting
+# Rate limiting (opcional)
 limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["10 per minute"])
-
-# Origens permitidas para verificação extra (opcional)
-ALLOWED_ORIGINS = [
-    "https://fadinha.xyz",
-    "https://bl4cksites.github.io",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500"
-]
-
-def check_origin():
-    referer = request.headers.get("Referer")
-    if referer:
-        for origin in ALLOWED_ORIGINS:
-            if referer.startswith(origin):
-                return True
-        logger.warning(f"Origem não permitida: {referer}")
-        return False
-    logger.warning("Requisição sem Referer.")
-    return True  # A validação principal é o Turnstile
 
 @app.route('/get-redirect', methods=['POST'])
 @limiter.limit("10 per minute")
 def get_redirect():
     client_ip = get_remote_address()
     logger.info(f"Requisição de IP: {client_ip}")
-
-    if not check_origin():
-        abort(403, description="Origem não autorizada.")
 
     data = request.get_json(silent=True)
     if not data or 'token' not in data:
@@ -60,7 +38,6 @@ def get_redirect():
 
     token = data['token']
 
-    # Verificar Turnstile
     try:
         resp = requests.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', data={
             'secret': TURNSTILE_SECRET,
@@ -79,14 +56,6 @@ def get_redirect():
     except requests.exceptions.RequestException as e:
         logger.error(f"Erro ao verificar Turnstile: {e}")
         return jsonify({"success": False, "error": "Erro interno"}), 500
-
-@app.errorhandler(429)
-def ratelimit_handler(e):
-    return jsonify({"success": False, "error": "Muitas requisições. Aguarde."}), 429
-
-@app.errorhandler(403)
-def forbidden(e):
-    return jsonify({"success": False, "error": "Acesso proibido"}), 403
 
 @app.route('/health')
 def health():
