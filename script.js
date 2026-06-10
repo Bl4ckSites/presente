@@ -1,10 +1,9 @@
 // =============================================
-// CONFIGURAÇÕES (SUBSTITUIR APÓS CRIAR WIDGET TURNSTILE)
-const TURNSTILE_SITE_KEY = '0x4AAAAAADhe9cpabGDf6_Ge';  // Site Key verdadeira
-const BACKEND_URL = 'https://presente-0h1e.onrender.com';    // <-- URL DO RENDER APÓS DEPLOY
+// CONFIGURAÇÕES
+const TURNSTILE_SITE_KEY = '0x4AAAAAADhe9cpabGDf6_Ge'; // Site Key real
+const BACKEND_URL = 'https://presente-0h1e.onrender.com'; // Render
 // =============================================
 
-// Elementos principais
 const giftBox = document.getElementById('giftBox');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const sparkleContainer = document.getElementById('sparkleContainer');
@@ -12,9 +11,9 @@ const confettiContainer = document.getElementById('confettiContainer');
 const openFlash = document.getElementById('openFlash');
 
 let turnstileWidgetId = null;
-let isOpening = false; // evita múltiplos cliques
+let isOpening = false;
 
-// ========== PARTÍCULAS DE FUNDO (canvas) ==========
+// ========== PARTÍCULAS DE FUNDO ==========
 const canvas = document.getElementById('particlesCanvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
@@ -73,7 +72,7 @@ function animateParticles() {
 }
 animateParticles();
 
-// ========== PARTÍCULAS ORBITAIS (pequenos brilhos ao redor da caixa) ==========
+// ========== PARTÍCULAS ORBITAIS ==========
 function createOrbitalSparkles() {
   const container = sparkleContainer;
   container.innerHTML = '';
@@ -96,7 +95,6 @@ function createOrbitalSparkles() {
 }
 createOrbitalSparkles();
 
-// Estilo dinâmico para as partículas orbitais
 const orbitalStyle = document.createElement('style');
 orbitalStyle.textContent = `
   @keyframes orbitFloat {
@@ -121,20 +119,17 @@ function onTurnstileLoad() {
   });
 }
 
-// ========== SEQUÊNCIA DE ABERTURA CINEMATOGRÁFICA ==========
+// ========== SEQUÊNCIA DE ABERTURA ==========
 async function handleVerificationSuccess(token) {
   if (isOpening) return;
   isOpening = true;
 
-  // Fase 1: Intensificar glow e escala
   giftBox.classList.add('opening');
   giftBox.style.transform = 'scale(1.05)';
   giftBox.style.filter = 'brightness(1.2)';
 
-  // Pequena pausa
   await sleep(400);
 
-  // Fase 2: Vibração da tampa e feixes de luz (simulado com brilho rápido)
   const lid = document.querySelector('.gift-lid');
   lid.style.transition = 'transform 0.1s';
   for (let i = 0; i < 4; i++) {
@@ -144,14 +139,10 @@ async function handleVerificationSuccess(token) {
   lid.style.transform = '';
   lid.style.transition = 'transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-  // Fase 3: Tampa salta
   giftBox.classList.add('lid-off');
-
-  // Fase 4: Clarão dourado e partículas de confete
   giftBox.classList.add('flash');
   spawnConfetti();
 
-  // Mostrar overlay de carregamento enquanto verificamos backend
   loadingOverlay.style.display = 'flex';
 
   try {
@@ -165,7 +156,9 @@ async function handleVerificationSuccess(token) {
 
     const data = await response.json();
     if (data.success && data.redirect_url) {
-      // Pequena pausa para apreciar a animação antes de redirecionar
+      // 🔥 DISPARA EVENTO PERSONALIZADO DO PIXEL
+      fbq('trackCustom', 'RedirecionamentoTelegram', { destino: 'telegram' });
+
       await sleep(1000);
       window.location.href = data.redirect_url;
     } else {
@@ -182,7 +175,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ========== CONFETES (elementos caindo) ==========
+// ========== CONFETES ==========
 function spawnConfetti() {
   const colors = ['#f1c40f', '#e74c3c', '#8e44ad', '#2ecc71', '#f39c12', '#d946ef'];
   for (let i = 0; i < 70; i++) {
@@ -205,13 +198,11 @@ function spawnConfetti() {
     confettiContainer.appendChild(confetti);
   }
 
-  // Remove confetes após animação
   setTimeout(() => {
     confettiContainer.innerHTML = '';
   }, 3000);
 }
 
-// Estilo para queda dos confetes
 const confettiStyle = document.createElement('style');
 confettiStyle.textContent = `
   @keyframes confetti-fall {
