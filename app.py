@@ -9,8 +9,7 @@ import requests
 app = Flask(__name__)
 
 # Configuração CORS – permite explicitamente o domínio do seu GitHub Pages
-CORS(app, resources={r"/get-redirect": {"origins": "https://bl4cksites.github.io"}})
-
+CORS(app, resources={r"/get-redirect": {"origins": "https://fadinha.xyz"}})
 # Chave secreta do Turnstile (vem do ambiente)
 TURNSTILE_SECRET = os.getenv("TURNSTILE_SECRET")
 # URL de destino (Telegram)
@@ -28,6 +27,7 @@ limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["10 per 
 
 # Origens permitidas para verificação extra (opcional)
 ALLOWED_ORIGINS = [
+    "https://fadinha.xyz",
     "https://bl4cksites.github.io",
     "http://localhost:5500",
     "http://127.0.0.1:5500"
