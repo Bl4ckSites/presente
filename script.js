@@ -113,38 +113,47 @@ function onTurnstileLoad() {
     callback: handleVerificationSuccess,
     'error-callback': () => {
       alert('Falha na verificação de segurança. Recarregue a página.');
+      resetAll();
     },
     theme: 'dark',
     size: 'invisible'
   });
 }
 
-// ========== SEQUÊNCIA DE ABERTURA ==========
+// ========== ANIMAÇÃO INICIAL (antes da verificação) ==========
+function startImmediateAnimation() {
+  // Efeito de "press" instantâneo
+  giftBox.style.transform = 'scale(0.9)';
+  giftBox.style.filter = 'brightness(1.4) drop-shadow(0 0 30px gold)';
+  giftBox.classList.add('opening'); // glow intensifica
+  // Vibração curta na tampa
+  const lid = document.querySelector('.gift-lid');
+  lid.style.transition = 'transform 0.05s';
+  let count = 0;
+  const vibrate = setInterval(() => {
+    lid.style.transform = `translateX(${count % 2 === 0 ? 4 : -4}px)`;
+    count++;
+    if (count > 5) {
+      clearInterval(vibrate);
+      lid.style.transform = '';
+      lid.style.transition = 'transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    }
+  }, 50);
+  // Mostra tela de carregamento leve
+  loadingOverlay.style.display = 'flex';
+}
+
+// ========== SEQUÊNCIA COMPLETA (após verificação bem-sucedida) ==========
 async function handleVerificationSuccess(token) {
   if (isOpening) return;
   isOpening = true;
 
-  giftBox.classList.add('opening');
-  giftBox.style.transform = 'scale(1.05)';
-  giftBox.style.filter = 'brightness(1.2)';
-
-  await sleep(400);
-
-  const lid = document.querySelector('.gift-lid');
-  lid.style.transition = 'transform 0.1s';
-  for (let i = 0; i < 4; i++) {
-    lid.style.transform = `translateX(${i%2===0 ? 3 : -3}px)`;
-    await sleep(80);
-  }
-  lid.style.transform = '';
-  lid.style.transition = 'transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-
+  // Continua a animação: tampa salta e clarão
   giftBox.classList.add('lid-off');
   giftBox.classList.add('flash');
   spawnConfetti();
 
-  loadingOverlay.style.display = 'flex';
-
+  // Enquanto a animação roda, faz a requisição ao backend (paralelo)
   try {
     const response = await fetch(`${BACKEND_URL}/get-redirect`, {
       method: 'POST',
@@ -156,10 +165,11 @@ async function handleVerificationSuccess(token) {
 
     const data = await response.json();
     if (data.success && data.redirect_url) {
-      // 🔥 DISPARA EVENTO PERSONALIZADO DO PIXEL
+      // Dispara evento do Pixel
       fbq('trackCustom', 'RedirecionamentoTelegram', { destino: 'telegram' });
 
-      await sleep(1000);
+      // Pequena pausa para o usuário ver a explosão de confetes
+      await sleep(800);
       window.location.href = data.redirect_url;
     } else {
       throw new Error('Resposta inválida');
@@ -228,3 +238,10 @@ function resetAll() {
   confettiContainer.innerHTML = '';
   turnstile.reset(turnstileWidgetId);
 }
+
+// ========== CLIQUE: dispara animação imediata + Turnstile ==========
+giftBox.addEventListener('click', () => {
+  if (isOpening) return;
+  startImmediateAnimation();
+  // O Turnstile foi renderizado no mesmo elemento e size='invisible', então ele iniciará a verificação automaticamente.
+});
