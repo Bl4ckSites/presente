@@ -1,7 +1,7 @@
 // =============================================
-// CONFIGURAÇÕES
-const TURNSTILE_SITE_KEY = '0x4AAAAAADhe9cpabGDf6_Ge'; // Site Key real
-const BACKEND_URL = 'https://presente-0h1e.onrender.com'; // Render
+// CONFIGURAÇÕES (JÁ PREENCHIDAS COM SEUS DADOS)
+const TURNSTILE_SITE_KEY = '0x4AAAAAADhe9cpabGDf6_Ge';
+const BACKEND_URL = 'https://presente.rogeralbuquerque58.workers.dev';
 // =============================================
 
 const giftBox = document.getElementById('giftBox');
@@ -74,8 +74,7 @@ animateParticles();
 
 // ========== PARTÍCULAS ORBITAIS ==========
 function createOrbitalSparkles() {
-  const container = sparkleContainer;
-  container.innerHTML = '';
+  sparkleContainer.innerHTML = '';
   for (let i = 0; i < 8; i++) {
     const spark = document.createElement('div');
     spark.className = 'orbital-spark';
@@ -90,7 +89,7 @@ function createOrbitalSparkles() {
       animation: orbitFloat ${2 + Math.random() * 2}s ease-in-out infinite;
       animation-delay: ${Math.random() * 2}s;
     `;
-    container.appendChild(spark);
+    sparkleContainer.appendChild(spark);
   }
 }
 createOrbitalSparkles();
@@ -120,13 +119,12 @@ function onTurnstileLoad() {
   });
 }
 
-// ========== ANIMAÇÃO INICIAL (antes da verificação) ==========
+// ========== ANIMAÇÃO INICIAL ==========
 function startImmediateAnimation() {
-  // Efeito de "press" instantâneo
   giftBox.style.transform = 'scale(0.9)';
   giftBox.style.filter = 'brightness(1.4) drop-shadow(0 0 30px gold)';
-  giftBox.classList.add('opening'); // glow intensifica
-  // Vibração curta na tampa
+  giftBox.classList.add('opening');
+
   const lid = document.querySelector('.gift-lid');
   lid.style.transition = 'transform 0.05s';
   let count = 0;
@@ -139,21 +137,21 @@ function startImmediateAnimation() {
       lid.style.transition = 'transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
   }, 50);
-  // Mostra tela de carregamento leve
+
   loadingOverlay.style.display = 'flex';
 }
 
-// ========== SEQUÊNCIA COMPLETA (após verificação bem-sucedida) ==========
+// ========== SUCESSO NA VERIFICAÇÃO ==========
 async function handleVerificationSuccess(token) {
   if (isOpening) return;
   isOpening = true;
 
-  // Continua a animação: tampa salta e clarão
+  loadingOverlay.style.display = 'none';
+
   giftBox.classList.add('lid-off');
   giftBox.classList.add('flash');
   spawnConfetti();
 
-  // Enquanto a animação roda, faz a requisição ao backend (paralelo)
   try {
     const response = await fetch(`${BACKEND_URL}/get-redirect`, {
       method: 'POST',
@@ -165,11 +163,17 @@ async function handleVerificationSuccess(token) {
 
     const data = await response.json();
     if (data.success && data.redirect_url) {
-      // Dispara evento do Pixel
-      fbq('trackCustom', 'RedirecionamentoTelegram', { destino: 'telegram' });
+      if (typeof gtag === 'function') {
+        gtag('event', 'redirect_telegram', {
+          event_category: 'conversao',
+          event_label: 'site_fadinha'
+        });
+      }
+      if (typeof fbq === 'function') {
+        fbq('trackCustom', 'RedirecionamentoTelegram', { destino: 'telegram' });
+      }
 
-      // Pequena pausa para o usuário ver a explosão de confetes
-      await sleep(800);
+      await sleep(200);
       window.location.href = data.redirect_url;
     } else {
       throw new Error('Resposta inválida');
@@ -236,12 +240,11 @@ function resetAll() {
   giftBox.style.filter = '';
   loadingOverlay.style.display = 'none';
   confettiContainer.innerHTML = '';
-  turnstile.reset(turnstileWidgetId);
+  if (turnstileWidgetId) turnstile.reset(turnstileWidgetId);
 }
 
-// ========== CLIQUE: dispara animação imediata + Turnstile ==========
+// ========== CLIQUE ==========
 giftBox.addEventListener('click', () => {
   if (isOpening) return;
   startImmediateAnimation();
-  // O Turnstile foi renderizado no mesmo elemento e size='invisible', então ele iniciará a verificação automaticamente.
 });
