@@ -22,7 +22,7 @@ body {
   user-select: none;
 }
 
-/* Camada de fundo simples (gradiente, sem imagens) */
+/* Camada de fundo (gradiente) */
 .bg-layer {
   position: fixed;
   inset: 0;
@@ -30,51 +30,38 @@ body {
   z-index: 0;
 }
 
-/* Esferas de luz – reduzidas em tamanho e desfoque no mobile */
+/* Esferas de luz – reduzidas e sem blur em celulares antigos */
 .blur-orb {
   position: fixed;
   border-radius: 50%;
-  opacity: 0.2;
   z-index: 0;
   pointer-events: none;
-  will-change: transform;
 }
 
 .orb-1 {
-  width: 60vw;
-  height: 60vw;
-  max-width: 600px;
-  max-height: 600px;
+  width: 60vw; height: 60vw; max-width: 600px; max-height: 600px;
   background: #7b2ff7;
-  top: -20%;
-  left: -15%;
+  top: -20%; left: -15%;
   filter: blur(80px);
+  opacity: 0.2;
   animation: drift-orb1 20s linear infinite alternate;
 }
 
 .orb-2 {
-  width: 50vw;
-  height: 50vw;
-  max-width: 500px;
-  max-height: 500px;
+  width: 50vw; height: 50vw; max-width: 500px; max-height: 500px;
   background: #d946ef;
-  bottom: -15%;
-  right: -10%;
+  bottom: -15%; right: -10%;
   filter: blur(80px);
+  opacity: 0.15;
   animation: drift-orb2 22s linear infinite alternate;
 }
 
 .orb-3 {
-  width: 40vw;
-  height: 40vw;
-  max-width: 400px;
-  max-height: 400px;
+  width: 40vw; height: 40vw; max-width: 400px; max-height: 400px;
   background: #f59e0b;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
   filter: blur(60px);
-  opacity: 0.15;
+  opacity: 0.1;
   animation: drift-orb3 24s linear infinite alternate;
 }
 
@@ -91,18 +78,21 @@ body {
   100% { transform: translate(-50%, -50%) translate(20px, -30px); }
 }
 
-/* Canvas de partículas: só aparece em telas com largura > 600px (performance) */
+/* Remover desfoque pesado em celulares antigos para performance */
+@media (max-width: 374px) {
+  .orb-1, .orb-2 { filter: blur(40px); opacity: 0.1; }
+  .orb-3 { filter: blur(30px); opacity: 0.05; }
+}
+
+/* Canvas de partículas – só ativo em telas maiores que 600px */
 #particlesCanvas {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
-
 @media (max-width: 600px) {
-  #particlesCanvas {
-    display: none;
-  }
+  #particlesCanvas { display: none; }
 }
 
 /* Container central */
@@ -120,38 +110,27 @@ body {
 /* ========== CAIXA DE PRESENTE ========== */
 .gift-wrapper {
   position: relative;
-  width: 55vw;
-  height: 60vw;
-  max-width: 240px;
-  max-height: 260px;
+  width: 55vw; height: 60vw;
+  max-width: 240px; max-height: 260px;
   cursor: pointer;
   transform-origin: center 70%;
   animation: float 6s ease-in-out infinite;
   transition: transform 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* Redução de sombras e efeitos pesados no mobile */
-.gift-wrapper:hover {
-  transform: scale(1.03);
-}
-
-.gift-wrapper:active {
-  transform: scale(0.97);
-}
+.gift-wrapper:hover { transform: scale(1.03); }
+.gift-wrapper:active { transform: scale(0.97); }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
 
-/* Brilho ambiente – menor e mais leve */
+/* Brilho ambiente (glow) */
 .gift-glow {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 120%;
-  height: 120%;
+  top: 50%; left: 50%;
+  width: 120%; height: 120%;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%);
   border-radius: 50%;
@@ -165,27 +144,24 @@ body {
   50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
 }
 
-/* Anel orbitante – removido em mobile */
+/* Anel orbitante dourado – retorna em telas médias e grandes */
 .gift-wrapper::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 120%;
-  height: 120%;
+  top: 50%; left: 50%;
+  width: 120%; height: 120%;
   transform: translate(-50%, -50%) rotateX(75deg);
   border-radius: 50%;
-  border: 2px solid rgba(241, 196, 15, 0.3);
+  border: 2px solid rgba(241, 196, 15, 0.4);
   box-shadow: 0 0 15px rgba(241, 196, 15, 0.2), inset 0 0 15px rgba(241, 196, 15, 0.1);
   animation: ring-rotate 10s linear infinite;
   z-index: 1;
   pointer-events: none;
+  display: none; /* escondido por padrão (mobile antigo) */
 }
 
-@media (max-width: 600px) {
-  .gift-wrapper::before {
-    display: none;
-  }
+@media (min-width: 375px) {
+  .gift-wrapper::before { display: block; }
 }
 
 @keyframes ring-rotate {
@@ -193,14 +169,12 @@ body {
   100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
 }
 
-/* Estrelas cintilantes – reduzidas */
+/* Estrelas cintilantes estáticas (pseudo-elemento) */
 .gift-wrapper::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background:
     radial-gradient(1.5px 1.5px at 20% 30%, #fff 0%, transparent 100%),
     radial-gradient(1px 1px at 80% 20%, #fff 0%, transparent 100%),
@@ -216,25 +190,21 @@ body {
   pointer-events: none;
 }
 
-@media (max-width: 600px) {
-  .gift-wrapper::after {
-    opacity: 0.3;
-    animation-duration: 8s;
-  }
-}
-
 @keyframes twinkle {
   0% { opacity: 0.3; }
   100% { opacity: 0.7; }
 }
 
+/* Em telas muito pequenas, estrelas mais sutis */
+@media (max-width: 374px) {
+  .gift-wrapper::after { opacity: 0.25; }
+}
+
 /* Tampa */
 .gift-lid {
   position: absolute;
-  top: 0;
-  left: 6%;
-  width: 88%;
-  height: 16%;
+  top: 0; left: 6%;
+  width: 88%; height: 16%;
   z-index: 5;
   transform-origin: left bottom;
   transition: transform 0.5s ease;
@@ -242,10 +212,8 @@ body {
 
 .lid-top {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 55%;
+  top: 0; left: 0;
+  width: 100%; height: 55%;
   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
   border-radius: 6px 6px 0 0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 12px rgba(0,0,0,0.4);
@@ -255,10 +223,8 @@ body {
 .lid-top::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   animation: lid-shimmer 4s ease-in-out infinite;
 }
@@ -271,10 +237,8 @@ body {
 
 .lid-front {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 45%;
+  bottom: 0; left: 0;
+  width: 100%; height: 45%;
   background: #b03a2e;
   border-radius: 0 0 4px 4px;
   box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
@@ -282,10 +246,8 @@ body {
 
 .lid-shine {
   position: absolute;
-  top: 8%;
-  left: 12%;
-  width: 35%;
-  height: 20%;
+  top: 8%; left: 12%;
+  width: 35%; height: 20%;
   background: rgba(255,255,255,0.4);
   border-radius: 20px;
   filter: blur(2px);
@@ -295,16 +257,13 @@ body {
 /* Base */
 .gift-base {
   position: absolute;
-  bottom: 0;
-  left: 6%;
-  width: 88%;
-  height: 68%;
+  bottom: 0; left: 6%;
+  width: 88%; height: 68%;
   z-index: 3;
 }
 
 .base-front {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   background: linear-gradient(180deg, #e74c3c 0%, #922b21 100%);
   border-radius: 0 0 8px 8px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 18px rgba(0,0,0,0.5);
@@ -315,10 +274,8 @@ body {
 .base-front::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 200%;
-  height: 25px;
+  bottom: 0; left: 0;
+  width: 200%; height: 25px;
   background: linear-gradient(0deg, rgba(255,255,255,0.1) 0%, transparent 70%);
   border-radius: 50%;
   animation: base-wave 6s ease-in-out infinite;
@@ -331,10 +288,7 @@ body {
 
 .base-inner {
   position: absolute;
-  top: 6%;
-  left: 8%;
-  right: 8%;
-  bottom: 10%;
+  top: 6%; left: 8%; right: 8%; bottom: 10%;
   background: radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%);
   border-radius: 4px;
 }
@@ -342,10 +296,8 @@ body {
 /* Fitas */
 .gift-ribbon-vertical {
   position: absolute;
-  top: -1%;
-  left: 43%;
-  width: 14%;
-  height: 102%;
+  top: -1%; left: 43%;
+  width: 14%; height: 102%;
   background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
   z-index: 4;
   box-shadow: 0 0 8px rgba(241,196,15,0.4);
@@ -354,10 +306,8 @@ body {
 
 .gift-ribbon-horizontal {
   position: absolute;
-  top: 46%;
-  left: 6%;
-  width: 88%;
-  height: 12%;
+  top: 46%; left: 6%;
+  width: 88%; height: 12%;
   background: linear-gradient(0deg, #f1c40f 0%, #f39c12 100%);
   z-index: 4;
   box-shadow: 0 0 8px rgba(241,196,15,0.4);
@@ -368,10 +318,8 @@ body {
 .gift-ribbon-horizontal::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
   animation: ribbon-shimmer 2.5s ease-in-out infinite;
 }
@@ -388,9 +336,7 @@ body {
 
 .ribbon-shine {
   position: absolute;
-  top: 15%;
-  left: 20%;
-  right: 20%;
+  top: 15%; left: 20%; right: 20%;
   height: 30%;
   background: rgba(255,255,255,0.5);
   border-radius: 4px;
@@ -400,10 +346,8 @@ body {
 /* Laço */
 .gift-bow {
   position: absolute;
-  top: -15%;
-  left: 32%;
-  width: 36%;
-  height: 25%;
+  top: -15%; left: 32%;
+  width: 36%; height: 25%;
   z-index: 6;
   animation: bow-wiggle 5s ease-in-out infinite;
 }
@@ -416,49 +360,42 @@ body {
 
 .bow-loop {
   position: absolute;
-  width: 44%;
-  height: 70%;
+  width: 44%; height: 70%;
   background: radial-gradient(circle at 30% 30%, #f1c40f, #e67e22);
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 .bow-left {
-  top: 10%;
-  left: 0;
+  top: 10%; left: 0;
   transform: rotate(-25deg);
 }
 
 .bow-right {
-  top: 10%;
-  right: 0;
+  top: 10%; right: 0;
   transform: rotate(25deg);
 }
 
 .bow-center {
   position: absolute;
-  bottom: 0;
-  left: 50%;
+  bottom: 0; left: 50%;
   transform: translateX(-50%);
-  width: 26%;
-  height: 26%;
+  width: 26%; height: 26%;
   background: #e67e22;
   border-radius: 3px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
-/* Partículas orbitais – apenas em desktop */
+/* ========== EFEITOS EXTRAS (apenas telas maiores) ========== */
 .sparkle-container {
-  display: none; /* removido para performance; se quiser, ative com media query */
+  display: none; /* removido para performance */
 }
 
 /* Brilho ao abrir */
 .open-flash {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 90%;
-  height: 90%;
+  top: 50%; left: 50%;
+  width: 90%; height: 90%;
   background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, transparent 70%);
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;
@@ -467,21 +404,17 @@ body {
   pointer-events: none;
 }
 
-.open-flash::before,
-.open-flash::after {
-  display: none; /* reduz complexidade */
-}
+/* Raios simplificados removidos para leveza */
 
 /* Confetes */
 .confetti-container {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   pointer-events: none;
   z-index: 10;
 }
 
-/* Texto */
+/* Texto "Toque na caixa" */
 .touch-text {
   color: rgba(255,255,255,0.9);
   font-size: clamp(0.9rem, 3vw, 1.1rem);
@@ -496,7 +429,7 @@ body {
   50% { opacity: 1; }
 }
 
-/* Loading overlay – mais leve, sem backdrop-filter em mobile */
+/* ========== LOADING OVERLAY (sempre com círculo girando) ========== */
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -506,29 +439,26 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
   color: white;
   font-size: 1rem;
 }
 
-@supports (backdrop-filter: blur(10px)) {
-  .loading-overlay {
-    background: rgba(2,2,16,0.8);
-    backdrop-filter: blur(10px);
-  }
+/* Animação de pulsar no texto do loading */
+.loading-overlay p {
+  animation: pulse-text 1.5s ease-in-out infinite;
 }
 
-@media (max-width: 600px) {
-  .loading-overlay {
-    background: rgba(2,2,16,0.95);
-    backdrop-filter: none;
-  }
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
+/* Círculo giratório */
 .loader-ring {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255,255,255,0.15);
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255,255,255,0.15);
   border-top-color: #f1c40f;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -538,7 +468,28 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* ========== ANIMAÇÕES ABERTURA (via JS) ========== */
+/* Ajustes para celulares antigos */
+@media (max-width: 374px) {
+  .loader-ring {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+  .loading-overlay {
+    background: rgba(2,2,16,0.95);
+    backdrop-filter: none;
+  }
+}
+
+/* Suporte a backdrop-filter apenas se o dispositivo suportar bem */
+@supports (backdrop-filter: blur(10px)) and (min-width: 600px) {
+  .loading-overlay {
+    background: rgba(2,2,16,0.8);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* ========== ANIMAÇÕES DE ABERTURA (via JS) ========== */
 .gift-wrapper.opening .gift-glow {
   animation: glow-intensify 0.6s forwards;
 }
@@ -563,31 +514,43 @@ body {
   100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
 }
 
-/* ========== RESPONSIVO FINO ========== */
-@media (max-width: 400px) {
+/* ========== MEDIA QUERIES PROGRESSIVAS ========== */
+
+/* Celulares antigos (até 374px) – desempenho máximo */
+@media (max-width: 374px) {
   .gift-wrapper {
-    width: 70vw;
-    height: 75vw;
+    width: 70vw; height: 75vw;
   }
-  .touch-text {
-    font-size: 0.85rem;
-  }
-  .loader-ring {
-    width: 32px;
-    height: 32px;
+  .gift-glow {
+    filter: blur(12px);
   }
 }
 
-@media (min-width: 601px) and (max-width: 1024px) {
+/* Celulares modernos (375px - 600px) – visual intermediário */
+@media (min-width: 375px) and (max-width: 600px) {
   .gift-wrapper {
-    width: 45vw;
-    height: 50vw;
-    max-width: 300px;
-    max-height: 320px;
+    width: 60vw; height: 65vw;
+    max-width: 280px; max-height: 300px;
   }
 }
 
-/* Otimização geral: desativa animações se usuário prefere redução de movimento */
+/* Tablets e desktop (acima de 600px) – visual completo */
+@media (min-width: 601px) {
+  .gift-wrapper {
+    width: 240px; height: 260px;
+    animation: float 6s ease-in-out infinite, gift-shadow-pulse 3s ease-in-out infinite;
+  }
+  .gift-wrapper:hover {
+    filter: drop-shadow(0 0 25px rgba(241, 196, 15, 0.7));
+  }
+  @keyframes gift-shadow-pulse {
+    0%, 100% { filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6)); }
+    50% { filter: drop-shadow(0 15px 35px rgba(241,196,15,0.4)); }
+  }
+  /* Reativar partículas canvas (gerido pelo JS) */
+}
+
+/* Respeitar preferência de redução de movimento */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
